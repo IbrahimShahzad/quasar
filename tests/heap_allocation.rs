@@ -58,3 +58,16 @@ fn many_boxes() {
         assert_eq!(*x, i);
     }
 }
+
+// The main limitation of a bump allocator is that it can only reuse deallocated memory
+// after all allocations have been freed. This means that a single long-lived allocation
+// suffices to prevent memory reuse.
+#[test_case]
+fn many_boxes_long_lived() {
+    let long_lived = Box::new(1); // new
+    for i in 0..HEAP_SIZE {
+        let x = Box::new(i);
+        assert_eq!(*x, i);
+    }
+    assert_eq!(*long_lived, 1); // new
+}
